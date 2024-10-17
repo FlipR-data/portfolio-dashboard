@@ -8,7 +8,6 @@ format:
     orientation: columns
 ---
 
-
 ```{r, loadpackages}
 #| echo: false
 #| include: false
@@ -18,6 +17,7 @@ library(tidyverse)
 ## Column {width="35%"}
 
 Placeholder text for column 1
+
 ```{r, printstarwars}
 
 head(starwars)
@@ -38,4 +38,4 @@ Placeholder text for column 2 row 2
 
 Placeholder text for column 2 row 3
 
----
+------------------------------------------------------------------------
