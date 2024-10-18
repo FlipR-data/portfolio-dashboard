@@ -154,16 +154,6 @@
       ],
       "Hash": "f27411eb6d9c3dada5edd444b8416675"
     },
-    "Rsymphony": {
-      "Package": "Rsymphony",
-      "Version": "0.1-33",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "3f55239fe534fe91e739c77d99a4ffbf"
-    },
     "TTR": {
       "Package": "TTR",
       "Version": "0.24.4",
