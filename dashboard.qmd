@@ -1,17 +1,23 @@
-column 2
-
 ---
 title: "Portfolio Report"
 format: 
   dashboard:
     logo: "images/logo.jpg"
     orientation: columns
+params:
+  alpha: !expr  c("GOOG","AAPL","AMZN","NVDA","VUSA.AS","JNJ","NKE","SGBS.MI","IBM" )
+  weight: !expr  c(3,0.05,2,2,2,1.29,2,0.44,1)
 ---
 
 ```{r, loadpackages}
 #| echo: false
 #| include: false
-library(tidyverse)
+library(pacman)
+
+p_load(tidyverse, reactable,reactablefmtr,dataui,htmltools,
+       htmlwidgets,lubridate,glue,bizdays,quantmod,plotrix,
+       bslib,shiny,bsicons,plotly,PerformanceAnalytics,PortfolioAnalytics,ROI.plugin.quadprog)
+
 ```
 
 ## Column {width="35%"}
@@ -21,6 +27,169 @@ Placeholder text for column 1
 ```{r, printstarwars}
 
 head(starwars)
+
+```
+
+
+```{css, echo=FALSE}
+.stock-list {
+  list-style-type: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  gap: 20px; /* Space between items */
+}
+
+.stock-item {
+  background-color: #f9f9f9; /* Light background */
+  border: 1px solid #ddd; /* Border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 15px; /* Padding inside items */
+  transition: transform 0.2s; /* Smooth hover effect */
+}
+
+.stock-item:hover {
+  transform: scale(1.02); /* Scale effect on hover */
+}
+
+.stock-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.stock-value {
+  color: #007bff; /* Blue for values */
+}
+
+.stock-details {
+  margin-top: 10px;
+}
+```
+
+```{r}
+#| warning: false
+#| echo: false
+
+# Sample data for stock options
+list_stocks <- params$alpha
+pw<- params$weight
+
+stock_data <- getQuote(list_stocks,what=yahooQF(c("Name","Open","P/E Ratio","Dividend/Share")))
+names(stock_data)<-c("Trade_Time","Full_Name","Value","PE_Ratio","Dividend_Per_Share")
+stock_data$Stock_Name<-row.names(stock_data)
+stock_data$quantity<-params$weight
+
+
+###estimate value of portfolio at last day
+prices <- getSymbols(list_stocks, from = "2019-01-01", to = "2024-10-15",
+                     auto.assign = TRUE)
+price_pie<-prices %>% 
+           map(~Ad(get(.))) %>% 
+           reduce(merge)
+values<-as.data.frame(last( price_pie)) * pw
+
+
+###calulate rentability
+
+pr_monthly <- to.monthly(price_pie, indexAt = "lastof", OHLC = FALSE)
+rt_monthly <- na.omit(Return.calculate(pr_monthly, method = "log"))
+rt_rebal_mo <- Return.portfolio(rt_monthly, weights = pw, 
+                                rebalance_on = "months")
+
+ ###Total value
+pw <- params$weight
+price_tmp <- params$weight[1]*Ad(get(params$alpha[1]))
+names(price_tmp) <- "Total"
+for (s in 2:length( params$alpha)) {
+  price_tmp<- price_tmp + params$weight[s]*Ad(get(params$alpha[s]))
+}
+
+
+## GET NUMBERS FOR widget
+## 6 month ,1 year and 5 years performance
+to_plot<-as.data.frame(price_tmp)
+to_plot$date<-index(price_tmp)
+
+
+
+pr_1month<-to.period(price_tmp, period = "months",k=1)
+rt_1month <- na.omit(Return.calculate(pr_1month, method = "discrete"))
+p1m<-as.numeric(last(rt_1month$`price_tmp.Close`))
+
+pr_6month<-to.period(price_tmp, period = "months",k=6)
+rt_6month <- na.omit(Return.calculate(pr_6month, method = "discrete"))
+p6m<-as.numeric(last(rt_6month$`price_tmp.Close`))
+
+
+pr_12month<-to.period(price_tmp, period = "months",k=12)
+rt_12month <- na.omit(Return.calculate(pr_12month, method = "discrete"))
+p12m<-as.numeric(last(rt_12month$`price_tmp.Close`))
+
+pr_60month<-to.period(price_tmp, period = "years",k=5)
+rt_60month <- na.omit(Return.calculate(pr_60month, method = "discrete"))
+p60m<-as.numeric(last(rt_60month$`price_tmp.Close`))
+
+```
+
+## Summary
+
+```{r}
+#| warning: false
+#| echo: false
+
+
+sparkline <- plot_ly(to_plot) %>%
+  add_lines(
+    x = ~date, y = ~Total,
+    color = I("white"), span = I(1),
+    fill = 'tozeroy', alpha = 0.2
+  ) %>%
+  layout(
+    xaxis = list(visible = F, showgrid = F, title = ""),
+    yaxis = list(visible = F, showgrid = F, title = ""),
+    hovermode = "x",
+    margin = list(t = 0, r = 0, l = 0, b = 0),
+    font = list(color = "white"),
+    paper_bgcolor = "transparent",
+    plot_bgcolor = "transparent"
+  ) %>%
+  config(displayModeBar = F) %>%
+  htmlwidgets::onRender(
+    "function(el) {
+      el.closest('.bslib-value-box')
+        .addEventListener('bslib.card', function(ev) {
+          Plotly.relayout(el, {'xaxis.visible': ev.detail.fullScreen});
+        })
+    }"
+  )
+
+
+vbs <- list(
+  value_box(
+    title = "Portfolio Value ($)",
+    value = round(sum(values),0.01),
+    showcase = bs_icon("wallet"),
+    theme = "purple",
+    p(paste0("Number of Positions: ",length(params$alpha))),
+    p(paste0("Sharpe Ratio: ",round(SharpeRatio(rt_rebal_mo)[1,1],3)))
+  ),
+
+value_box(
+  title = "Performance last month",
+  value = paste0(round(p1m*100,1)," %"),
+  p(paste0("last 6 month: ",round(p6m*100,1)," %")),
+  p(paste0("last 1 year: ",round(p12m*100,1)," %")),
+  p(paste0("last 5 years: ",round(p60m*100,1)," %")),
+  showcase = sparkline,
+  full_screen = TRUE,
+  theme = "success"
+)
+)
+
+layout_column_wrap(
+  width = "175px",
+  !!!vbs
+)
 
 ```
 
