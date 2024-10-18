@@ -13,7 +13,7 @@ params:
 #| echo: false
 #| include: false
 library(pacman)
-
+##remotes::install_github("timelyportfolio/dataui")
 p_load(tidyverse, reactable,reactablefmtr,dataui,htmltools,
        htmlwidgets,lubridate,glue,bizdays,quantmod,plotrix,
        bslib,shiny,bsicons,plotly,PerformanceAnalytics)
@@ -470,7 +470,26 @@ pie3D(x=pct,labels= new_labels,col= rainbow(length(pct)),explode=0.1,labelcex=1,
 
 ### Row {width="60%"}
 
-Placeholder text for column 2 row 2
 
 
-------------------------------------------------------------------------
+
+```{r}
+#| warning: false
+#| echo: false
+
+#Let s give a ponderation and compare to S&P 500.
+Indice<-Ad(VUSA.AS)
+names(Indice)<-"SP500"
+coef<-as.numeric(price_tmp[1,]/Indice[1,])
+###The goal here is to simulate what would happen  if we have built a 1000$ portfolio and we look how it would have evolved
+
+#The first date we see the value of the portfolio was:   370.7300 
+#What would happend if we only bought an S&P 500 at that time . 
+###25.547   370.73/25.547 =14.51 stocks 
+
+plot.xts(cbind(price_tmp,coef*Indice),main = 'Portfolio vs. S&P500',legend.loc="topleft")
+
+
+```
+
+ 
