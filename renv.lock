@@ -76,25 +76,6 @@
       ],
       "Hash": "5ff15925d7e369565203053934e8d9d9"
     },
-    "PortfolioAnalytics": {
-      "Package": "PortfolioAnalytics",
-      "Version": "2.0.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "GenSA",
-        "PerformanceAnalytics",
-        "R",
-        "ROI.plugin.symphony",
-        "foreach",
-        "mco",
-        "methods",
-        "pso",
-        "xts",
-        "zoo"
-      ],
-      "Hash": "5d5a1c554baa2428db04b18e844dcde1"
-    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",

@@ -16,7 +16,7 @@ library(pacman)
 
 p_load(tidyverse, reactable,reactablefmtr,dataui,htmltools,
        htmlwidgets,lubridate,glue,bizdays,quantmod,plotrix,
-       bslib,shiny,bsicons,plotly,PerformanceAnalytics,PortfolioAnalytics)
+       bslib,shiny,bsicons,plotly,PerformanceAnalytics)
 
 ```
 
