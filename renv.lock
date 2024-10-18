@@ -143,19 +143,6 @@
       ],
       "Hash": "e0a816879f2f4d37e767e7ccb017812f"
     },
-    "ROI.plugin.symphony": {
-      "Package": "ROI.plugin.symphony",
-      "Version": "1.0-0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "ROI",
-        "Rsymphony",
-        "methods",
-        "slam"
-      ],
-      "Hash": "0d5d6f983334cf25a47eef4b293fb299"
-    },
     "Rcpp": {
       "Package": "Rcpp",
       "Version": "1.0.13",
