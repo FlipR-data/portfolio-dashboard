@@ -115,34 +115,6 @@
       ],
       "Hash": "45f0398006e83a5b10b72a90663d8d8c"
     },
-    "ROI": {
-      "Package": "ROI",
-      "Version": "1.0-1",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "checkmate",
-        "methods",
-        "registry",
-        "slam",
-        "utils"
-      ],
-      "Hash": "42ce9ee4c1cf168869f4386d2cdeadd2"
-    },
-    "ROI.plugin.quadprog": {
-      "Package": "ROI.plugin.quadprog",
-      "Version": "1.0-1",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "ROI",
-        "methods",
-        "quadprog",
-        "slam"
-      ],
-      "Hash": "e0a816879f2f4d37e767e7ccb017812f"
-    },
     "Rcpp": {
       "Package": "Rcpp",
       "Version": "1.0.13",
